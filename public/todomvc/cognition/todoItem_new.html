@@ -1,0 +1,43 @@
+<li data-map-item="li" class="completed">
+        <find name="destroyTodo" local="destroyTodo"></find>
+
+    <div class="view">
+        <input id="doneBtn" class="toggle" type="checkbox" checked>
+        <label id="itemText"></label>
+        <button id="removeBtn" class="destroy"></button>
+    </div>
+    <input id="entryField" class="edit" value="Create a TodoMVC template">
+</li>
+
+
+<script>
+    $.ndash.use({
+
+
+        enter: function(){
+
+            var self = this;
+
+            this.removeBtn.on("click",function(){
+                self.destroyTodo.tell(self.mapItem.itemData);
+            });
+
+            this.doneBtn.on("click", function(){
+
+                var data = self.mapItem.itemData;
+                if(data) {
+                    data.completed = !data.completed;
+                    self.mapItem.findData("updateTodo").tell(data);
+                }
+            });
+        },
+
+        update: function(){
+            var data = this.mapItem.itemData;
+            this.itemText.text(data.text);
+            this.mapItem.localSel.toggleClass("completed",data.completed);
+            this.doneBtn.prop("checked", data.completed);
+        }
+    });
+
+</script>

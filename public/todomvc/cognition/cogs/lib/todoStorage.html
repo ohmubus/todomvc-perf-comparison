@@ -1,0 +1,116 @@
+<blueprint>
+
+    <data name="storage" value="run readLocalStorage" prop="true" />
+    <data name="storageView" />
+    <data name="activeCount" prop="true" />
+    <data name="completedCount" prop="true" />
+    <data name="filter" />
+
+    <data name="cmd_CreateTodo"/>
+    <data name="cmd_MarkTodo"/>
+    <data name="cmd_DestroyTodo"/>
+    <data name="cmd_MarkAll"/>
+    <data name="cmd_ClearCompleted"/>
+    <data name="cmd_Refresh" />
+
+    <sensor cmd="cmd_MarkTodo" need="storage" transform="markTodo" pipe="storage" />
+    <sensor cmd="cmd_CreateTodo" need="storage" transform="createTodo" pipe="storage" />
+    <sensor cmd="cmd_DestroyTodo" need="storage" transform="destroyTodo" pipe="storage" />
+    <sensor cmd="cmd_MarkAll" need="storage" transform="markAll" pipe="storage" />
+    <sensor cmd="cmd_ClearCompleted" need="storage" transform="clearCompleted" pipe="storage" />
+    <sensor cmd="cmd_Refresh" need="storage" transform="read storage" pipe="storage" />
+
+    <sensor watch="storage" run="saveToLocal"  />
+    <sensor watch="storage" transform="toActiveCount" pipe="activeCount" />
+    <sensor watch="storage" transform="toCompletedCount" pipe="completedCount" />
+
+    <sensor watch="filter" need="storage" transform="filterView" pipe="storageView" />
+
+</blueprint>
+
+<script>
+
+    $.cog({
+
+        LOCAL_STORAGE_NAME: "todomvc_cognition",
+
+        readLocalStorage: function(){
+            return JSON.parse(localStorage.getItem(this.LOCAL_STORAGE_NAME) || '[]');
+        },
+
+        writeLocalStorage: function(msg){
+            localStorage.setItem(this.LOCAL_STORAGE_NAME, JSON.stringify(msg));
+        },
+
+        destroyTodo: function (msg) {
+
+            msg.storage.splice(msg.storage.indexOf(msg.cmd_DestroyTodo), 1);
+            return msg.storage;
+
+        },
+
+        markAll: function (msg) {
+
+            return msg.storage.map(function(todo){
+                todo.completed = msg.cmd_MarkAll;
+                return todo;
+            });
+
+        },
+
+        markTodo: function (msg) {
+
+            msg.cmd_MarkTodo.completed = !msg.cmd_MarkTodo.completed;
+            return msg.storage;
+
+        },
+
+        toCount: function(msg){
+            return msg.length;
+        },
+
+        createTodo: function (msg) {
+
+            msg.storage.push({text: msg.cmd_CreateTodo, completed: false, editing: false});
+            return msg.storage;
+
+        },
+
+        clearCompleted: function (msg) {
+            return msg.storage.filter(this.activeFilter);
+        },
+
+        saveToLocal: function (msg) {
+            localStorage.setItem(this.LOCAL_STORAGE_NAME, JSON.stringify(msg));
+        },
+
+        toCompletedCount: function(msg){
+            return msg.filter(this.completedFilter).length;
+        },
+
+        toActiveCount: function(msg){
+            return msg.filter(this.activeFilter).length;
+        },
+
+        completedFilter: function (d) {
+            return d.completed;
+        },
+
+        activeFilter: function (d) {
+            return !d.completed;
+        },
+
+        noFilter: function(){
+            return true;
+        },
+
+        filterView: function(msg) {
+
+            var filterMethod = msg.filter ? this[msg.filter] : this.noFilter;
+            return msg.storage.filter(filterMethod);
+
+        }
+
+    });
+
+</script>
