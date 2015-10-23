@@ -1,5 +1,8 @@
 # TodoMVC Performance Comparison
 
+Compare Cognition framework to other todomvc apps.
+
+
 Both Mercury and Elm are based on the [virtual-dom][] project which appears to
 be extremely fast.
 
@@ -13,4 +16,4 @@ a Macbook Air:
 
 [![Sample results for Chrome 35 + OSX 10.9.4 on a Macbook Air](sampleResults.png)][runner]
 
-[runner]: http://evancz.github.io/todomvc-perf-comparison/
+[runner]: http://landonbar.github.io/todomvc-perf-comparison/
