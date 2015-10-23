@@ -1,7 +1,7 @@
 <blueprint>
 
     <data name="todoEntry" />
-    <sensor node="newTodo" on="keypress" filter="isEnter" transform="trimText" pipe="todoEntry" />
+    <sensor node="newTodo" on="keydown" filter="isEnter" transform="trimText" pipe="todoEntry" />
     <sensor watch="todoEntry" adapt="trimText" filter="hasText" pipe="cmd_CreateTodo" />
     <sensor watch="cmd_CreateTodo" run="clearEntry" />
 

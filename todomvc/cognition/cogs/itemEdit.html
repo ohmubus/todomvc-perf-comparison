@@ -3,25 +3,16 @@
 
     <prop find="item" />
 
-    <data name="cmd_Edit" />
     <data name="cmd_Submit" />
     <data name="cmd_Update" />
     <data name="cmd_Cancel" />
-
-    <data name="editing" value="false" />
-
-    <sensor node="todoItem" on="dblclick" pipe="cmd_Edit" />
 
     <sensor node="entryField" on="keydown" filter="isEscape" pipe="cmd_Cancel" />
     <sensor node="entryField" on="keydown" filter="isEnter" pipe="cmd_Submit" />
     <sensor node="entryField" on="blur" adapt="read editing" filter="isTrue" pipe="cmd_Submit" />
 
-    <sensor node="markBtn" on="click" transform="read item" pipe="cmd_MarkTodo" />
-    <sensor node="destroyBtn" on="click" transform="read item" pipe="cmd_DestroyTodo" />
+    <sensor need="item,editing" run="render"  />
 
-    <sensor need="item,editing" run="render" />
-
-    <sensor cmd="cmd_Edit" transform="bool true" pipe="editing" />
     <sensor watch="cmd_Submit,cmd_Cancel" transform="bool false" pipe="editing" />
 
     <sensor cmd="cmd_Submit" filter="hasText" transform="read item" pipe="cmd_Update" />
@@ -34,14 +25,7 @@
 
 <display>
 
-    <li id="todoItem" class="completed">
-        <div class="view">
-            <input id="markBtn" class="toggle" type="checkbox" checked />
-            <label id="itemText"></label>
-            <button id="destroyBtn" class="destroy"></button>
-        </div>
-        <input id="entryField" class="edit" value="" />
-    </li>
+        <input id="entryField" class="edit" value=""  />
 
 </display>
 
@@ -49,6 +33,17 @@
 <script>
 
     $.cog({
+
+
+        init: function(){
+         console.log('editor!');
+        },
+
+        render: function(msg){
+            this.entryField.val(msg.item.text);
+            var f = this.entryField;
+            setTimeout(function(){ f && f.focus();}, 0);
+        },
 
         ENTER_KEY: 13,
         ESCAPE_KEY: 27,
@@ -80,21 +75,7 @@
         updateText: function(msg){
             msg.text = this.trimText();
             return msg;
-        },
-
-        render: function(msg){
-
-            this.itemText.text(msg.item.text);
-            this.todoItem.toggleClass("completed", msg.item.completed);
-            this.markBtn.prop("checked", msg.item.completed);
-            this.todoItem.toggleClass('editing', msg.editing);
-
-            if(msg.editing)
-                this.entryField.val(msg.item.text).focus();
-
         }
-
-
 
     });
 
