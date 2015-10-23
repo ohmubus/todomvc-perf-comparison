@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Template • TodoMVC</title>
+		<link rel="stylesheet" href="bower_components/todomvc-common/base.css">
+		<link rel="stylesheet" href="css/app.css">
+	</head>
+	<body>
+
+        <div id="cognition"></div>
+
+		<!-- Scripts here. Don't remove this ↓ -->
+		<script src="bower_components/todomvc-common/base.js"></script>
+        <script src="bower_components/jquery/jquery.js"></script>
+        <script src="js/catbus.js"></script>
+        <script src="js/base64-string.js"></script>
+        <script src="js/lz-string.js"></script>
+        <script src="js/ndash.js"></script>
+
+        <script>
+
+            $(function(){
+                var sel = $("#cognition");
+                $.cognition.buildNum('VERNUM');
+                $.cognition.init(sel,"todomvc/cognition/cogs/app.html");
+            });
+
+        </script>
+
+	</body>
+</html>
