@@ -2,7 +2,7 @@
 var runs = [],
     res = document.getElementById('results'),
     timesRan = 0,
-    runButton
+    runButton;
 
 function formatTestName(suiteName, testName) {
     return suiteName + (testName ? '/' + testName : '');

@@ -1,12 +1,13 @@
 var numberOfItemsToAdd = 100;
 var Suites = [];
 
+
 Suites.push({
     name: 'Backbone',
     url: 'todomvc/backbone/index.html',
     version: '1.1.2',
     prepare: function (runner, contentWindow, contentDocument) {
-    contentWindow.Backbone.sync = function () {}
+        contentWindow.Backbone.sync = function () {}
         return runner.waitForElement('#new-todo').then(function (element) {
             element.focus();
             return element;
@@ -35,6 +36,9 @@ Suites.push({
         })
     ]
 });
+
+
+
 
 Suites.push({
     name: 'Ember',
@@ -273,17 +277,13 @@ Suites.push({
     },
     tests: [
         new BenchmarkTestStep('Adding' + numberOfItemsToAdd + 'Items', function (newTodo, contentWindow, contentDocument) {
-          for (var i = 0; i < numberOfItemsToAdd; i++) {
-              var inputEvent = document.createEvent('Event');
-              inputEvent.initEvent('input', true, true);
-              newTodo.value = 'Something to do ' + i;
-              newTodo.dispatchEvent(inputEvent);
-              
-              var keydownEvent = document.createEvent('Event');
-              keydownEvent.initEvent('keydown', true, true);
-              keydownEvent.keyCode = 13; // VK_ENTER
-              newTodo.dispatchEvent(keydownEvent);
-          }
+            for (var i = 0; i < numberOfItemsToAdd; i++) {
+                var keydownEvent = document.createEvent('Event');
+                keydownEvent.initEvent('keydown', true, true);
+                keydownEvent.keyCode = 13; // VK_ENTER
+                newTodo.value = 'Something to do ' + i;
+                newTodo.dispatchEvent(keydownEvent);
+            }
         }),
         new BenchmarkTestStep('CompletingAllItems', function (newTodo, contentWindow, contentDocument) {
             var checkboxes = contentDocument.querySelectorAll('.toggle');

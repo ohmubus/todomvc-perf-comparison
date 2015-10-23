@@ -13,14 +13,14 @@
     <data name="cmd_ClearCompleted"/>
     <data name="cmd_Refresh" />
 
-    <sensor cmd="cmd_MarkTodo" need="storage" transform="markTodo" pipe="storage" />
-    <sensor cmd="cmd_CreateTodo" need="storage" transform="createTodo" pipe="storage" />
-    <sensor cmd="cmd_DestroyTodo" need="storage" transform="destroyTodo" pipe="storage" />
-    <sensor cmd="cmd_MarkAll" need="storage" transform="markAll" pipe="storage" />
-    <sensor cmd="cmd_ClearCompleted" need="storage" transform="clearCompleted" pipe="storage" />
-    <sensor cmd="cmd_Refresh" need="storage" transform="read storage" pipe="storage" />
+    <sensor watch="cmd_MarkTodo" adapt="markTodo" transform="read storage" pipe="storage" />
+    <sensor watch="cmd_CreateTodo" transform="createTodo" pipe="storage" />
+    <sensor watch="cmd_DestroyTodo" transform="destroyTodo" pipe="storage" />
+    <sensor watch="cmd_MarkAll" transform="markAll" pipe="storage" />
+    <sensor watch="cmd_ClearCompleted" transform="clearCompleted" pipe="storage" />
+    <sensor watch="cmd_Refresh" transform="read storage" pipe="storage" />
 
-    <sensor watch="storage" run="saveToLocal"  />
+    <sensor watch="storage" run="writeLocalStorage"  />
     <sensor watch="storage" transform="toActiveCount" pipe="activeCount" />
     <sensor watch="storage" transform="toCompletedCount" pipe="completedCount" />
 
@@ -44,25 +44,23 @@
 
         destroyTodo: function (msg) {
 
-            msg.storage.splice(msg.storage.indexOf(msg.cmd_DestroyTodo), 1);
-            return msg.storage;
+            var storage = this.storage.read();
+            storage.splice(storage.indexOf(msg), 1);
+            return storage;
 
         },
 
         markAll: function (msg) {
 
-            return msg.storage.map(function(todo){
-                todo.completed = msg.cmd_MarkAll;
+            return this.storage.read().map(function(todo){
+                todo.completed = msg;
                 return todo;
             });
 
         },
 
         markTodo: function (msg) {
-
-            msg.cmd_MarkTodo.completed = !msg.cmd_MarkTodo.completed;
-            return msg.storage;
-
+            msg.completed = !msg.completed;
         },
 
         toCount: function(msg){
@@ -71,17 +69,15 @@
 
         createTodo: function (msg) {
 
-            msg.storage.push({text: msg.cmd_CreateTodo, completed: false, editing: false});
-            return msg.storage;
+            var todo = {text: msg, completed: false};
+            var storage = this.storage.read();
+            storage.push(todo);
+            return storage;
 
         },
 
         clearCompleted: function (msg) {
-            return msg.storage.filter(this.activeFilter);
-        },
-
-        saveToLocal: function (msg) {
-            localStorage.setItem(this.LOCAL_STORAGE_NAME, JSON.stringify(msg));
+            return this.storage.read().filter(this.activeFilter);
         },
 
         toCompletedCount: function(msg){

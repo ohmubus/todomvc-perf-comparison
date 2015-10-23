@@ -1,100 +1,34 @@
 
 <blueprint>
 
-    <prop find="item" />
-
-    <data name="cmd_Edit" />
-    <data name="cmd_Submit" />
-    <data name="cmd_Update" />
-    <data name="cmd_Cancel" />
-
-    <data name="editing" value="false" />
-
-    <sensor node="todoItem" on="dblclick" pipe="cmd_Edit" />
-
-    <sensor node="entryField" on="keydown" filter="isEscape" pipe="cmd_Cancel" />
-    <sensor node="entryField" on="keydown" filter="isEnter" pipe="cmd_Submit" />
-    <sensor node="entryField" on="blur" adapt="read editing" filter="isTrue" pipe="cmd_Submit" />
-
+    <sensor node="itemView" on="dblclick" transform="bool true" pipe="editing" />
     <sensor node="markBtn" on="click" transform="read item" pipe="cmd_MarkTodo" />
     <sensor node="destroyBtn" on="click" transform="read item" pipe="cmd_DestroyTodo" />
-
-    <sensor need="item,editing" run="render" />
-
-    <sensor cmd="cmd_Edit" transform="bool true" pipe="editing" />
-    <sensor watch="cmd_Submit,cmd_Cancel" transform="bool false" pipe="editing" />
-
-    <sensor cmd="cmd_Submit" filter="hasText" transform="read item" pipe="cmd_Update" />
-    <sensor cmd="cmd_Submit" filter="isEmpty" transform="read item" pipe="cmd_DestroyTodo" />
-    <sensor cmd="cmd_Cancel" pipe="cmd_Refresh" />
-    <sensor cmd="cmd_Update" transform="updateText" pipe="cmd_Refresh" />
+    <sensor watch="item" run="render" />
 
 </blueprint>
 
 
 <display>
 
-    <li id="todoItem" class="completed">
-        <div class="view">
+        <div id="itemView" class="view">
             <input id="markBtn" class="toggle" type="checkbox" checked />
             <label id="itemText"></label>
             <button id="destroyBtn" class="destroy"></button>
         </div>
-        <input id="entryField" class="edit" value="" />
-    </li>
 
 </display>
-
 
 <script>
 
     $.cog({
 
-        ENTER_KEY: 13,
-        ESCAPE_KEY: 27,
-
-        isTrue: function(msg){
-            return msg;
-        },
-
-        isEnter: function(ev){
-            return ev.which === this.ENTER_KEY;
-        },
-
-        isEscape: function(ev){
-            return ev.which === this.ESCAPE_KEY;
-        },
-
-        trimText: function(){
-            return this.entryField.val().trim();
-        },
-
-        hasText: function(){
-            return this.trimText().length > 0;
-        },
-
-        isEmpty: function(){
-            return !this.hasText();
-        },
-
-        updateText: function(msg){
-            msg.text = this.trimText();
-            return msg;
-        },
-
         render: function(msg){
 
-            this.itemText.text(msg.item.text);
-            this.todoItem.toggleClass("completed", msg.item.completed);
-            this.markBtn.prop("checked", msg.item.completed);
-            this.todoItem.toggleClass('editing', msg.editing);
-
-            if(msg.editing)
-                this.entryField.val(msg.item.text).focus();
+            this.itemText.text(msg.text);
+            this.markBtn.prop("checked", msg.completed);
 
         }
-
-
 
     });
 
