@@ -281,6 +281,7 @@ Suites.push({
                 var keydownEvent = document.createEvent('Event');
                 keydownEvent.initEvent('keydown', true, true);
                 keydownEvent.keyCode = 13; // VK_ENTER
+                keydownEvent.which = 13; // VK_ENTER
                 newTodo.value = 'Something to do ' + i;
                 newTodo.dispatchEvent(keydownEvent);
             }
